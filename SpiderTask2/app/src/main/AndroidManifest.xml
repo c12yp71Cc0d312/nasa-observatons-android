@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ApodActivity"/>
+        <activity android:name=".NasaIVLibActivity"/>
     </application>
 
 </manifest>

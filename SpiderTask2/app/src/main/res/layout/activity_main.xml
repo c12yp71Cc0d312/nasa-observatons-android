@@ -32,4 +32,17 @@
         app:layout_constraintTop_toBottomOf="@+id/textView_appTitle"
         app:layout_constraintVertical_bias="0.194" />
 
+    <Button
+        android:id="@+id/button_ivlib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="IV Lib"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/button_apod"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/button_apod"
+        app:layout_constraintTop_toBottomOf="@+id/button_apod"
+        app:layout_constraintVertical_bias="0.057" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

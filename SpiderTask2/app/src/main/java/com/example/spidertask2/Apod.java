@@ -6,7 +6,6 @@ public class Apod {
     private String explanation;
     private String hdurl;
     private String media_type;
-    private String service_version;
     private String title;
     private String url;
 
@@ -24,10 +23,6 @@ public class Apod {
 
     public String getMedia_type() {
         return media_type;
-    }
-
-    public String getService_version() {
-        return service_version;
     }
 
     public String getTitle() {
