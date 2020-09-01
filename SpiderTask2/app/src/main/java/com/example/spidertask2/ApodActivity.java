@@ -106,6 +106,9 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
             public void onResponse(Call<Apod> call, Response<Apod> response) {
                 if(!response.isSuccessful()) {
                     explanation.setText("Error code: " + response.code());
+                    apod.setImageResource(R.drawable.placeholder);
+                    title.setText("");
+                    explanation.setText("Error code: " + response.code());
                     return;
                 }
 
@@ -115,7 +118,7 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
                 explanation.setText("Explanation: " + content.getExplanation());
                 if(content.getMedia_type().equals("image")) {
                     Picasso.get()
-                            .load(content.getHdurl())
+                            .load(content.getUrl())
                             .placeholder(R.drawable.placeholder)
                             .into(apod);
                 }
@@ -123,6 +126,9 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
 
             @Override
             public void onFailure(Call<Apod> call, Throwable t) {
+                explanation.setText(t.getMessage());
+                apod.setImageResource(R.drawable.placeholder);
+                title.setText("");
                 explanation.setText(t.getMessage());
             }
         });

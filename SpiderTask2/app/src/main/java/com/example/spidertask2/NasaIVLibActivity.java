@@ -1,5 +1,6 @@
 package com.example.spidertask2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +22,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class NasaIVLibActivity extends AppCompatActivity {
+public class NasaIVLibActivity extends AppCompatActivity implements SearchItemsAdapter.OnItemListener {
 
     private static final String TAG = "NasaIVLibActivity";
 
@@ -31,15 +32,14 @@ public class NasaIVLibActivity extends AppCompatActivity {
     private Button search;
     private EditText text;
 
-    private NasaIVLibApi nasaIVLibApi;
     private ArrayList<DataItems> dataItems;
-    private CollectionImageAndVideoLibrary collection;
-    private ArrayList<ItemsIVLib> itemsIVLibs;
+    private NasaIVLibApi nasaIVLibApi;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ivlib);
+        getSupportActionBar().setTitle("NASA Image and Video Library");
 
         search = findViewById(R.id.button_search);
         text = findViewById(R.id.editText_search_text);
@@ -73,29 +73,24 @@ public class NasaIVLibActivity extends AppCompatActivity {
                     return;
                 }
 
+                CollectionImageAndVideoLibrary collection;
+                ArrayList<ItemsIVLib> itemsIVLibs;
+
                 collection = response.body().getCollection();
                 Log.d(TAG, "onResponse: response body: " + response.body());
 
                 itemsIVLibs = new ArrayList<>();
-              /*  if(collection != null) {
-                    for(CollectionImageAndVideoLibrary c : collection) {
-                        for(ItemsIVLib i : c.getItems()) {
-                            itemsIVLibs.add(i);
-                        }
-                    }
+
+                if(collection != null) {
+                    for(ItemsIVLib i : collection.getItems())
+                    itemsIVLibs.add(i);
                 }
-               */
-              if(collection != null) {
-                  for(ItemsIVLib i : collection.getItems())
-                  itemsIVLibs.add(i);
-              }
                 else {
                     Log.d(TAG, "onResponse: collection is null");
                 }
 
                 dataItems = new ArrayList<>();
 
-                //DataItems dataItem = new DataItems();
                 if(itemsIVLibs != null) {
                     for (ItemsIVLib item : itemsIVLibs) {
                         for(DataItems d : item.getData()) {
@@ -125,11 +120,22 @@ public class NasaIVLibActivity extends AppCompatActivity {
         recyclerView_items.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(this);
-        searchItemsAdapter = new SearchItemsAdapter(dataItems);
+        searchItemsAdapter = new SearchItemsAdapter(dataItems, this);
 
         recyclerView_items.setAdapter(searchItemsAdapter);
         recyclerView_items.setLayoutManager(layoutManager);
 
     }
 
+    @Override
+    public void onItemClick(int pos) {
+        DataItems item = dataItems.get(pos);
+        Intent toSearchResultActivity = new Intent(NasaIVLibActivity.this, SearchResultActivity.class);
+        toSearchResultActivity.putExtra("dataItem", item);
+        startActivity(toSearchResultActivity);
+
+        Log.d(TAG, "onItemClick: title: " + item.getTitle());
+        Log.d(TAG, "onItemClick: desc: " + item.getDescription());
+
+    }
 }

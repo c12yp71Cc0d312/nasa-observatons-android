@@ -20,6 +20,7 @@
         </activity>
         <activity android:name=".ApodActivity"/>
         <activity android:name=".NasaIVLibActivity"/>
+        <activity android:name=".SearchResultActivity"/>
     </application>
 
 </manifest>
