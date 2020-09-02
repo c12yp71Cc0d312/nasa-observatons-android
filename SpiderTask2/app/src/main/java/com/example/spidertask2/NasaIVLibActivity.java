@@ -86,7 +86,6 @@ public class NasaIVLibActivity extends AppCompatActivity implements SearchItemsA
                             itemsIVLibs.add(i);
                     } else {
                         Log.d(TAG, "onResponse: collection is null");
-                        Toast.makeText(NasaIVLibActivity.this, "No Search Results", Toast.LENGTH_SHORT).show();
                     }
 
                     dataItems = new ArrayList<>();
@@ -99,7 +98,6 @@ public class NasaIVLibActivity extends AppCompatActivity implements SearchItemsA
                         }
                     } else {
                         Log.d(TAG, "onResponse: ItemsIVLibs false");
-                        Toast.makeText(NasaIVLibActivity.this, "No Search Results", Toast.LENGTH_SHORT).show();
                     }
 
                     setUpRecyclerView();
@@ -121,14 +119,20 @@ public class NasaIVLibActivity extends AppCompatActivity implements SearchItemsA
 
     public void setUpRecyclerView() {
 
-        recyclerView_items = findViewById(R.id.recycler_view_search_results);
-        recyclerView_items.setHasFixedSize(true);
+        if(dataItems.size() == 0) {
+            Toast.makeText(this, "No Results Found", Toast.LENGTH_SHORT).show();
+        }
 
-        layoutManager = new LinearLayoutManager(this);
-        searchItemsAdapter = new SearchItemsAdapter(dataItems, this);
+        else {
+            recyclerView_items = findViewById(R.id.recycler_view_search_results);
+            recyclerView_items.setHasFixedSize(true);
 
-        recyclerView_items.setAdapter(searchItemsAdapter);
-        recyclerView_items.setLayoutManager(layoutManager);
+            layoutManager = new LinearLayoutManager(this);
+            searchItemsAdapter = new SearchItemsAdapter(dataItems, this);
+
+            recyclerView_items.setAdapter(searchItemsAdapter);
+            recyclerView_items.setLayoutManager(layoutManager);
+        }
 
     }
 
