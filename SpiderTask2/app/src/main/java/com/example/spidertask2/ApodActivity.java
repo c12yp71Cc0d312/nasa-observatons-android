@@ -3,6 +3,7 @@ package com.example.spidertask2;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -13,6 +14,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.YouTubePlayerUtils;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -38,6 +43,8 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
     public static final String API_KEY = "N5tmmGjzqvEa8yilpjmrh2ya4eFv6Yau8xxto7de";
     private String dateFormatted;
 
+    private YouTubePlayerView youTubePlayerView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +59,9 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
         explanation = findViewById(R.id.textView_explanation);
 
         explanation.setMovementMethod(new ScrollingMovementMethod());
+
+        youTubePlayerView = findViewById(R.id.youtube_player);
+        getLifecycle().addObserver(youTubePlayerView);
 
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,12 +126,34 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
 
                 title.setText(content.getTitle());
                 explanation.setText("Explanation: " + content.getExplanation());
+
                 if(content.getMedia_type().equals("image")) {
+                    youTubePlayerView.setVisibility(View.GONE);
+                    apod.setVisibility(View.VISIBLE);
+
                     Picasso.get()
                             .load(content.getUrl())
                             .placeholder(R.drawable.placeholder)
                             .into(apod);
                 }
+
+                else if(content.getMedia_type().equals("video")) {
+                    youTubePlayerView.setVisibility(View.VISIBLE);
+                    apod.setVisibility(View.INVISIBLE);
+
+                    String url = content.getUrl();
+                    Log.d(TAG, "onResponse: url: " + url);
+                    String[] str = url.split("\\?");
+                    String[] str2 = str[0].split("/");
+                    String videoID = str2[str2.length - 1];
+                    Log.d(TAG, "onReady: videoid: " + videoID);
+
+                    youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
+                        youTubePlayer.cueVideo(videoID, 0);
+                    });
+
+                }
+
             }
 
             @Override

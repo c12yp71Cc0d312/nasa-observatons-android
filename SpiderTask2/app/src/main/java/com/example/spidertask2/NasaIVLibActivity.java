@@ -62,55 +62,60 @@ public class NasaIVLibActivity extends AppCompatActivity implements SearchItemsA
 
     public void getContent() {
 
-        Log.d(TAG, "getContent: text: " + text.getText().toString());
-        Call<ImageAndVideoLibrary> call = nasaIVLibApi.getCollection(text.getText().toString());
-        call.enqueue(new Callback<ImageAndVideoLibrary>() {
-            @Override
-            public void onResponse(Call<ImageAndVideoLibrary> call, Response<ImageAndVideoLibrary> response) {
-                if(!response.isSuccessful()) {
-                    Toast.makeText(NasaIVLibActivity.this, "Code: " + response.code(), Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "onResponse: Code: " + response.code());
-                    return;
-                }
-
-                CollectionImageAndVideoLibrary collection;
-                ArrayList<ItemsIVLib> itemsIVLibs;
-
-                collection = response.body().getCollection();
-                Log.d(TAG, "onResponse: response body: " + response.body());
-
-                itemsIVLibs = new ArrayList<>();
-
-                if(collection != null) {
-                    for(ItemsIVLib i : collection.getItems())
-                    itemsIVLibs.add(i);
-                }
-                else {
-                    Log.d(TAG, "onResponse: collection is null");
-                }
-
-                dataItems = new ArrayList<>();
-
-                if(itemsIVLibs != null) {
-                    for (ItemsIVLib item : itemsIVLibs) {
-                        for(DataItems d : item.getData()) {
-                            dataItems.add(d);
-                        }
+        if(!(text.getText().toString().trim().equals("") || text.getText() == null)) {
+            Call<ImageAndVideoLibrary> call = nasaIVLibApi.getCollection(text.getText().toString());
+            call.enqueue(new Callback<ImageAndVideoLibrary>() {
+                @Override
+                public void onResponse(Call<ImageAndVideoLibrary> call, Response<ImageAndVideoLibrary> response) {
+                    if (!response.isSuccessful()) {
+                        Toast.makeText(NasaIVLibActivity.this, "Code: " + response.code(), Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "onResponse: Code: " + response.code());
+                        return;
                     }
-                }
-                else {
-                    Log.d(TAG, "onResponse: ItemsIVLibs false");
+
+                    CollectionImageAndVideoLibrary collection;
+                    ArrayList<ItemsIVLib> itemsIVLibs;
+
+                    collection = response.body().getCollection();
+                    Log.d(TAG, "onResponse: response body: " + response.body());
+
+                    itemsIVLibs = new ArrayList<>();
+
+                    if (collection != null) {
+                        for (ItemsIVLib i : collection.getItems())
+                            itemsIVLibs.add(i);
+                    } else {
+                        Log.d(TAG, "onResponse: collection is null");
+                        Toast.makeText(NasaIVLibActivity.this, "No Search Results", Toast.LENGTH_SHORT).show();
+                    }
+
+                    dataItems = new ArrayList<>();
+
+                    if (itemsIVLibs != null) {
+                        for (ItemsIVLib item : itemsIVLibs) {
+                            for (DataItems d : item.getData()) {
+                                dataItems.add(d);
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "onResponse: ItemsIVLibs false");
+                        Toast.makeText(NasaIVLibActivity.this, "No Search Results", Toast.LENGTH_SHORT).show();
+                    }
+
+                    setUpRecyclerView();
                 }
 
-                setUpRecyclerView();
-            }
+                @Override
+                public void onFailure(Call<ImageAndVideoLibrary> call, Throwable t) {
+                    Log.d(TAG, "onFailure: " + t.getMessage());
+                    Toast.makeText(NasaIVLibActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
 
-            @Override
-            public void onFailure(Call<ImageAndVideoLibrary> call, Throwable t) {
-                Log.d(TAG, "onFailure: " + t.getMessage());
-                Toast.makeText(NasaIVLibActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+        else {
+            Toast.makeText(this, "Text field is empty", Toast.LENGTH_SHORT).show();
+        }
 
     }
 

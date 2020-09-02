@@ -81,7 +81,15 @@ public class SearchResultActivity extends AppCompatActivity {
 
                 ArrayList<MediaAssetItems> items = collection.getItems();
 
-                String imageUrl = items.get(0).getHref().replace("http", "https");
+                String imageUrl = "";
+                for(int i = 0; i < items.size(); i++) {
+                    String mediaItemUrl = items.get(i).getHref();
+                    if(mediaItemUrl.endsWith(".jpg") && (!mediaItemUrl.contains("orig")) && (!mediaItemUrl.contains("thumb"))) {
+                        imageUrl = mediaItemUrl;
+                        imageUrl = imageUrl.replace("http", "https");
+                        break;
+                    }
+                }
 
                 Log.d(TAG, "onResponse: nasaid: " + nasaID);
                 Log.d(TAG, "onResponse: url: " + imageUrl);
