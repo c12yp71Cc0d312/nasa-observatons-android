@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.DialogFragment;
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
@@ -45,6 +47,8 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
 
     private YouTubePlayerView youTubePlayerView;
 
+    private ConstraintLayout constraintLayout;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +56,7 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
         getSupportActionBar().setTitle("APOD");
         getSupportActionBar().setSubtitle("Astronomy Picture of the Day");
 
+        constraintLayout = findViewById(R.id.constraint_layout_apod_activity);
         datePicker = findViewById(R.id.imageView_datePicker);
         apod = findViewById(R.id.imageView_apod);
         date = findViewById(R.id.textView_date);
@@ -116,6 +121,7 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
             public void onResponse(Call<Apod> call, Response<Apod> response) {
                 if(!response.isSuccessful()) {
                     explanation.setText("Error code: " + response.code());
+                    videoToImageLayout();
                     apod.setImageResource(R.drawable.placeholder);
                     title.setText("");
                     explanation.setText("Error code: " + response.code());
@@ -128,8 +134,7 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
                 explanation.setText("Explanation: " + content.getExplanation());
 
                 if(content.getMedia_type().equals("image")) {
-                    youTubePlayerView.setVisibility(View.GONE);
-                    apod.setVisibility(View.VISIBLE);
+                    videoToImageLayout();
 
                     Picasso.get()
                             .load(content.getUrl())
@@ -138,8 +143,7 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
                 }
 
                 else if(content.getMedia_type().equals("video")) {
-                    youTubePlayerView.setVisibility(View.VISIBLE);
-                    apod.setVisibility(View.INVISIBLE);
+                    imageToVideoLayout();
 
                     String url = content.getUrl();
                     Log.d(TAG, "onResponse: url: " + url);
@@ -159,10 +163,31 @@ public class ApodActivity extends AppCompatActivity implements DatePickerDialog.
             @Override
             public void onFailure(Call<Apod> call, Throwable t) {
                 explanation.setText(t.getMessage());
+                videoToImageLayout();
                 apod.setImageResource(R.drawable.placeholder);
                 title.setText("");
                 explanation.setText(t.getMessage());
             }
         });
     }
+
+    public void imageToVideoLayout() {
+        apod.setVisibility(View.GONE);
+        youTubePlayerView.setVisibility(View.VISIBLE);
+        Log.d(TAG, "imageToVideoLayout: player height: " + youTubePlayerView.getMeasuredHeight());
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(constraintLayout);
+        constraintSet.connect(R.id.textView_title, ConstraintSet.TOP, R.id.youtube_player, ConstraintSet.BOTTOM, 8);
+        constraintSet.applyTo(constraintLayout);
+    }
+
+    public void videoToImageLayout() {
+        apod.setVisibility(View.VISIBLE);
+        youTubePlayerView.setVisibility(View.GONE);
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(constraintLayout);
+        constraintSet.connect(R.id.textView_title, ConstraintSet.TOP, R.id.imageView_apod, ConstraintSet.BOTTOM, 8);
+        constraintSet.applyTo(constraintLayout);
+    }
+
 }
