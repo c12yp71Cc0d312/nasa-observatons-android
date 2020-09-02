@@ -94,10 +94,12 @@ public class SearchResultActivity extends AppCompatActivity {
                 Log.d(TAG, "onResponse: nasaid: " + nasaID);
                 Log.d(TAG, "onResponse: url: " + imageUrl);
 
-                Picasso.get()
-                        .load(imageUrl)
-                        .placeholder(R.drawable.placeholder)
-                        .into(image);
+                if(!imageUrl.equals("")) {
+                    Picasso.get()
+                            .load(imageUrl)
+                            .placeholder(R.drawable.placeholder)
+                            .into(image);
+                }
 
             }
 
