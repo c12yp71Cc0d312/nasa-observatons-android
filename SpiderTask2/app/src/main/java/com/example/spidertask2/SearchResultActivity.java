@@ -2,11 +2,11 @@ package com.example.spidertask2;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.method.MovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -99,6 +99,9 @@ public class SearchResultActivity extends AppCompatActivity {
                             .load(imageUrl)
                             .placeholder(R.drawable.placeholder)
                             .into(image);
+                }
+                else {
+                    Toast.makeText(SearchResultActivity.this, "No image available", Toast.LENGTH_SHORT).show();
                 }
 
             }

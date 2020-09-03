@@ -2,6 +2,9 @@ package com.example.spidertask2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -58,57 +61,35 @@ public class NasaIVLibActivity extends AppCompatActivity implements SearchItemsA
             }
         });
 
+        text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        searchForContent();
+                    }
+                }, 500);
+            }
+        });
+
     }
 
     public void getContent() {
 
         if(!(text.getText().toString().trim().equals("") || text.getText() == null)) {
-            Call<ImageAndVideoLibrary> call = nasaIVLibApi.getCollection(text.getText().toString());
-            call.enqueue(new Callback<ImageAndVideoLibrary>() {
-                @Override
-                public void onResponse(Call<ImageAndVideoLibrary> call, Response<ImageAndVideoLibrary> response) {
-                    if (!response.isSuccessful()) {
-                        Toast.makeText(NasaIVLibActivity.this, "Code: " + response.code(), Toast.LENGTH_LONG).show();
-                        Log.d(TAG, "onResponse: Code: " + response.code());
-                        return;
-                    }
-
-                    CollectionImageAndVideoLibrary collection;
-                    ArrayList<ItemsIVLib> itemsIVLibs;
-
-                    collection = response.body().getCollection();
-                    Log.d(TAG, "onResponse: response body: " + response.body());
-
-                    itemsIVLibs = new ArrayList<>();
-
-                    if (collection != null) {
-                        for (ItemsIVLib i : collection.getItems())
-                            itemsIVLibs.add(i);
-                    } else {
-                        Log.d(TAG, "onResponse: collection is null");
-                    }
-
-                    dataItems = new ArrayList<>();
-
-                    if (itemsIVLibs != null) {
-                        for (ItemsIVLib item : itemsIVLibs) {
-                            for (DataItems d : item.getData()) {
-                                dataItems.add(d);
-                            }
-                        }
-                    } else {
-                        Log.d(TAG, "onResponse: ItemsIVLibs false");
-                    }
-
-                    setUpRecyclerView();
-                }
-
-                @Override
-                public void onFailure(Call<ImageAndVideoLibrary> call, Throwable t) {
-                    Log.d(TAG, "onFailure: " + t.getMessage());
-                    Toast.makeText(NasaIVLibActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
+            searchForContent();
         }
 
         else {
@@ -147,4 +128,54 @@ public class NasaIVLibActivity extends AppCompatActivity implements SearchItemsA
         Log.d(TAG, "onItemClick: desc: " + item.getDescription());
 
     }
+
+    public void searchForContent() {
+        Call<ImageAndVideoLibrary> call = nasaIVLibApi.getCollection(text.getText().toString());
+        call.enqueue(new Callback<ImageAndVideoLibrary>() {
+            @Override
+            public void onResponse(Call<ImageAndVideoLibrary> call, Response<ImageAndVideoLibrary> response) {
+                if (!response.isSuccessful()) {
+                    //Toast.makeText(NasaIVLibActivity.this, "Code: " + response.code(), Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "onResponse: Code: " + response.code());
+                    return;
+                }
+
+                CollectionImageAndVideoLibrary collection;
+                ArrayList<ItemsIVLib> itemsIVLibs;
+
+                collection = response.body().getCollection();
+                Log.d(TAG, "onResponse: response body: " + response.body());
+
+                itemsIVLibs = new ArrayList<>();
+
+                if (collection != null) {
+                    for (ItemsIVLib i : collection.getItems())
+                        itemsIVLibs.add(i);
+                } else {
+                    Log.d(TAG, "onResponse: collection is null");
+                }
+
+                dataItems = new ArrayList<>();
+
+                if (itemsIVLibs != null) {
+                    for (ItemsIVLib item : itemsIVLibs) {
+                        for (DataItems d : item.getData()) {
+                            dataItems.add(d);
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "onResponse: ItemsIVLibs false");
+                }
+
+                setUpRecyclerView();
+            }
+
+            @Override
+            public void onFailure(Call<ImageAndVideoLibrary> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t.getMessage());
+                Toast.makeText(NasaIVLibActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 }
